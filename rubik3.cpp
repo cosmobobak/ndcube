@@ -95,6 +95,7 @@ struct Point {
         assert(rotation_axis != from_axis && from_axis != to_axis && to_axis != rotation_axis);
         assert(rotation_axis < DIMS && from_axis < DIMS && to_axis < DIMS);
 
+        // is this point on the face that we're rotating?
         if (coords[rotation_axis] != r.side) {
             return;
         }
@@ -247,7 +248,7 @@ struct Cube {
         return std::all_of(
             points.begin(),
             points.end(),
-            [](Point<DIMS> p) {
+            [](let p) {
                 return p.is_in_original_position() && (p.is_in_original_orientation() || p.is_center());
             });
     }
@@ -255,7 +256,7 @@ struct Cube {
     auto unsolvedness() const -> int {
         return std::transform_reduce(
             points.begin(), points.end(),
-            0, std::plus{}, [](auto p) {
+            0, std::plus{}, [](let p) {
                 return p.incorrectness();
             });
     }
@@ -279,7 +280,7 @@ struct Cube {
         std::vector<Rotation> rotations;
         while (!is_solved()) {
             let last_unsolvedness = unsolvedness();
-            auto r = Rotation::random<DIMS>();
+            let r = Rotation::random<DIMS>();
             rotate(r);
             rotations.push_back(r);
             let random_value = rand() % 100;
@@ -335,7 +336,7 @@ auto get_rots_from_user() -> std::vector<Rotation> {
     return result;
 }
 
-constexpr auto INIT_DIMS = 3;
+constexpr auto INIT_DIMS = 2;
 
 auto main() -> int {
     std::cout << "The N-D Cube (where N is currently " << INIT_DIMS << ")" << std::endl;
@@ -353,14 +354,14 @@ auto main() -> int {
 
     auto c = Cube<INIT_DIMS>();
 
-    c.shuffle(100);
+    // c.shuffle(100);
 
     c.show();
 
     loop {
         let rotations = get_rots_from_user<INIT_DIMS>();
 
-        for (auto r : rotations) {
+        for (let r : rotations) {
             c.rotate(r);
         }
 
